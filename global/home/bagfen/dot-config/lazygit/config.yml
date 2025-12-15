@@ -1,0 +1,13 @@
+git:
+  fetchAll: false
+  log:
+    # Improves performance
+    # https://github.com/jesseduffield/lazygit/issues/2875#issuecomment-1665376437
+    order: default
+gui:
+  theme:
+    activeBorderColor:
+    - blue
+    - bold
+    selectedLineBgColor:
+    - white

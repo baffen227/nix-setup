@@ -1,0 +1,12 @@
+
+# Access tokens and Credentials
+
+thehand/home/bagfen/dot-claude/*
+!thehand/home/bagfen/dot-claude/settings.json
+
+echoes/home/bagfen/dot-claude/*
+!echoes/home/bagfen/dot-claude/settings.json
+
+crazy-diamond/home/bagfen/dot-claude/*
+!crazy-diamond/home/bagfen/dot-claude/settings.json
+

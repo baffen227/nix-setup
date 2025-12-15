@@ -1,0 +1,50 @@
+[user]
+	name = Harry Chen
+	email = baffen227@gmail.com
+
+[core]
+	editor = nvim
+	autocrlf = input
+	safecrlf = true
+	quotepath = false
+
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	df = diff
+	lg = log --oneline --graph --decorate
+	last = log -1 HEAD
+	unstage = reset HEAD --
+	visual = !gitk
+	
+[push]
+	default = simple
+	autoSetupRemote = true
+
+[pull]
+	rebase = false
+
+[init]
+	defaultBranch = main
+
+[diff]
+	tool = vimdiff
+	colorMoved = default
+
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
+
+[color]
+	ui = auto
+	branch = auto
+	diff = auto
+	status = auto
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold

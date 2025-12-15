@@ -1,0 +1,65 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+    "agent": {
+        "model_parameters": [],
+        "default_model": {
+            "provider": "zed.dev",
+            "model": "claude-sonnet-4"
+        }
+    },
+    "icon_theme": "Catppuccin Macchiato",
+    "buffer_font_family": "Hack Nerd Font Mono",
+    "ui_font_size": 16,
+    "buffer_font_size": 16,
+    "theme": {
+        "mode": "system",
+        "light": "One Light",
+        "dark": "Catppuccin Macchiato"
+    },
+    "vim_mode": true,
+    "relative_line_numbers": true,
+    "tab_size": 4,
+    "hard_tabs": false,
+    "languages": {
+        // For Nix language, only use Nixd language server
+        // Ref: https://github.com/zed-extensions/nix
+        "Nix": { "language_servers": ["nixd", "!nil"] }
+    },
+    "lsp": {
+        "rust-analyzer": {
+            "initialization_options": {
+                "cargo": {
+                    "allTargets": false,
+                    // "target": "thumbv7em-none-eabihf",
+                    "target": "thumbv8m.main-none-eabihf",
+                    // "features": "all",
+                    // "features": ["backend", "wasm-http-client", "native-http-client"],
+                    "extraEnv": {
+                        "TEST_CI_BACKEND_URL": "http://127.0.0.1:8080"
+                    }
+                }
+                // "checkOnSave": false
+            }
+        },
+        // Ref: https://github.com/zed-extensions/nix
+        "nixd": {
+            "settings": {
+                // "diagnostics": {
+                //   "ignored": ["sema-extra-with"]
+                // },
+                "initialization_options": {
+                    "formatting": {
+                        "command": ["nixfmt"]
+                    }
+                }
+            }
+        }
+    }
+}
