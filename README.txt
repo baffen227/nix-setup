@@ -30,6 +30,7 @@ sudo stow -d ~/nix-setup --dotfiles --target / $(hostname)
 
 # Or specify host manually:
 sudo stow -d ~/nix-setup --dotfiles --target / crazy-diamond
+sudo stow -d ~/nix-setup --dotfiles --target / thehand
 ```
 
 #### Update System
