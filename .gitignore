@@ -1,6 +1,8 @@
 
 # Access tokens and Credentials
 
+# Claude Code
+
 thehand/home/bagfen/dot-claude/*
 !thehand/home/bagfen/dot-claude/settings.json
 
@@ -10,3 +12,13 @@ echoes/home/bagfen/dot-claude/*
 crazy-diamond/home/bagfen/dot-claude/*
 !crazy-diamond/home/bagfen/dot-claude/settings.json
 
+# Gemini CLI
+
+thehand/home/bagfen/dot-gemini/*
+!thehand/home/bagfen/dot-gemini/settings.json
+
+echoes/home/bagfen/dot-gemini/*
+!echoes/home/bagfen/dot-gemini/settings.json
+
+crazy-diamond/home/bagfen/dot-gemini/*
+!crazy-diamond/home/bagfen/dot-gemini/settings.json

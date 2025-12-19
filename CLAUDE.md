@@ -10,15 +10,15 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 
 ```
 .
-├── <hostname>/           # Host-specific configurations (e.g., crazy-diamond)
+├── <hostname>/           # Host-specific configurations (e.g., crazy-diamond, thehand)
 │   ├── etc/nixos/       # NixOS system configuration
 │   └── home/<user>/     # User-specific dotfiles
 └── global/              # Shared configurations across all hosts
-    └── home/<user>/     # User dotfiles (git, tmux, claude, zed, lazygit, etc.)
+    └── home/<user>/     # User dotfiles (git, tmux, gemini, claude, zed, lazygit, ghostty, etc.)
 ```
 
 **Key Architecture Points:**
-- Each hostname directory (e.g., `crazy-diamond/`) contains configurations specific to that machine
+- Each hostname directory (e.g., `crazy-diamond/`, `thehand/`) contains configurations specific to that machine
 - The `global/` directory contains shared dotfiles that apply to all hosts
 - Stow manages symlinks with the `--dotfiles` flag (files prefixed with `dot-` become `.` in the target)
 - NixOS configuration files are in `etc/nixos/` and symlinked to `/etc/nixos/`
@@ -93,6 +93,22 @@ sudo nix-channel --update
   - `<nixos-hardware/common/cpu/amd>`
   - `<nixos-hardware/common/gpu/amd>`
 
+### Host: thehand
+
+**Hardware:**
+- Lenovo ThinkPad T14s
+- Uses systemd-boot bootloader
+- Standard kernel (no special kernel parameters)
+
+**Desktop Environment:**
+- GNOME with GDM display manager
+- Excluded many default GNOME applications (see configuration.nix:232-251)
+- fcitx5 input method with Chewing (Traditional Chinese)
+
+**Key Configuration Imports:**
+- Hardware profile from nixos-hardware:
+  - `<nixos-hardware/lenovo/thinkpad/t14s>`
+
 ### Accessing Unstable Packages
 
 The configuration includes an `unstable` package set:
@@ -113,6 +129,11 @@ environment.systemPackages = [ unstable.some-package ];
 - `<hostname>/etc/nixos/hardware-configuration.nix` - Auto-generated hardware config (DO NOT manually edit)
 - `global/home/bagfen/dot-gitconfig` - Git configuration with aliases
 - `global/home/bagfen/dot-tmux.conf` - tmux configuration (prefix: C-a)
+- `global/home/bagfen/dot-gemini/settings.json` - Gemini settings
+- `global/home/bagfen/dot-claude/settings.json` - Claude settings
+- `global/home/bagfen/dot-config/ghostty/config` - Ghostty terminal configuration
+- `global/home/bagfen/dot-config/lazygit/config.yml` - Lazygit configuration
+- `global/home/bagfen/dot-config/zed/settings.json` - Zed editor settings
 
 ## Development Guidelines
 

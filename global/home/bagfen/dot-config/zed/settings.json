@@ -18,11 +18,7 @@
     "buffer_font_family": "Hack Nerd Font Mono",
     "ui_font_size": 16,
     "buffer_font_size": 16,
-    "theme": {
-        "mode": "system",
-        "light": "One Light",
-        "dark": "Catppuccin Macchiato"
-    },
+    "theme": "Catppuccin Macchiato",
     "vim_mode": true,
     "relative_line_numbers": true,
     "tab_size": 4,
