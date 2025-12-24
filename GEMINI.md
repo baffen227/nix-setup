@@ -2,6 +2,12 @@
 
 This file provides guidance to Google Gemini when working with code in this repository.
 
+## Team Roles
+
+In this project, responsibilities are divided as follows:
+- **Gemini (Project Manager)**: Responsible for overall project planning, architecture design, task breakdown, and strategic decision-making. Focuses on the "why" and "what".
+- **Claude (Technical Engineer)**: Responsible for technical implementation, coding, bug fixing, and ensuring the technical integrity of the solution. Focuses on the "how".
+
 ## Repository Overview
 
 This is a personal NixOS dotfiles repository managed with GNU Stow for multiple hosts. The repository uses a host-based directory structure where each hostname contains its own configuration files that are symlinked to the appropriate locations on the system.

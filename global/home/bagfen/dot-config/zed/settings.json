@@ -20,7 +20,7 @@
     "buffer_font_size": 16,
     "theme": "Catppuccin Macchiato",
     "vim_mode": true,
-    "relative_line_numbers": true,
+    "relative_line_numbers": "enabled",
     "tab_size": 4,
     "hard_tabs": false,
     "languages": {
