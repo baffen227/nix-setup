@@ -8,6 +8,13 @@ In this project, responsibilities are divided as follows:
 - **Gemini (Project Manager)**: Responsible for overall project planning, architecture design, task breakdown, and strategic decision-making. Focuses on the "why" and "what".
 - **Claude (Technical Engineer)**: Responsible for technical implementation, coding, bug fixing, and ensuring the technical integrity of the solution. Focuses on the "how".
 
+## Strategic Roadmap
+
+**Current Focus:** Migration to Flake-based Architecture
+- We are currently transitioning from a Stow-based setup to a pure Nix Flake architecture (inspired by hlissner/dotfiles).
+- See `MIGRATION_PLAN.md` for the detailed execution plan.
+- **Goal:** modular configuration, declarative dotfiles via home-manager, and eliminating Stow.
+
 ## Repository Overview
 
 This is a personal NixOS dotfiles repository managed with GNU Stow for multiple hosts. The repository uses a host-based directory structure where each hostname contains its own configuration files that are symlinked to the appropriate locations on the system.
@@ -19,8 +26,10 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 ├── <hostname>/           # Host-specific configurations (e.g., crazy-diamond, thehand)
 │   ├── etc/nixos/       # NixOS system configuration
 │   └── home/<user>/     # User-specific dotfiles
-└── global/              # Shared configurations across all hosts
-    └── home/<user>/     # User dotfiles (git, tmux, gemini, claude, zed, lazygit, ghostty, etc.)
+├── global/              # Shared configurations across all hosts
+│   ├── etc/nixos/       # Shared NixOS configurations (e.g., packages)
+│   └── home/<user>/     # User dotfiles (git, tmux, gemini, claude, zed, lazygit, ghostty, etc.)
+└── scripts/             # Utility scripts for system management
 ```
 
 **Key Architecture Points:**
@@ -30,9 +39,43 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 - NixOS configuration files are in `etc/nixos/` and symlinked to `/etc/nixos/`
 - User dotfiles are in `home/<username>/` and symlinked to the user's home directory
 
+## Helper Scripts
+
+The `scripts/` directory contains utility scripts to simplify common tasks. These scripts should be executed from the repository root.
+
+- `scripts/apply_stow.sh`: Applies configuration symlinks using Stow.
+- `scripts/rebuild_nixos.sh`: Rebuilds and switches the NixOS configuration.
+- `scripts/backup_configs.sh`: Backups existing configurations.
+- `scripts/check_stow.sh`: Verifies Stow symlinks.
+- `scripts/validate_nix.sh`: Validates Nix configuration syntax.
+- `scripts/unstow.sh`: Removes Stow symlinks.
+- `scripts/list_packages.sh`: Lists installed packages.
+- `scripts/show_links.sh`: Shows current Stow links.
+
 ## Essential Commands
 
-### Setup and Deployment
+### Primary Workflow (Using Scripts)
+
+The `scripts/` directory provides the recommended workflow for deployment, ensuring safety checks and consistent state.
+
+```bash
+# 1. Deploy & Switch (Recommended)
+# Handles global/host stow, validates config, and switches system.
+./scripts/rebuild_nixos.sh switch
+
+# 2. Test Changes (Temporary)
+# Applies changes but reverts on reboot.
+./scripts/rebuild_nixos.sh test
+
+# 3. Dry Run (Validation Only)
+./scripts/rebuild_nixos.sh dry-build
+```
+
+### Manual/Legacy Commands
+
+Use these only if scripts fail or for granular control.
+
+#### Setup and Deployment
 
 ```bash
 # Apply configuration for current host
