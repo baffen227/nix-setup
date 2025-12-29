@@ -20,24 +20,24 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 ```
 .
 ├── <hostname>/           # Host-specific configurations (e.g., crazy-diamond, thehand)
-│   ├── etc/nixos/       # NixOS system configuration
-│   └── home/<user>/     # User-specific dotfiles
+│   └── etc/nixos/       # NixOS system configuration
 ├── global/              # Shared configurations across all hosts
-│   ├── etc/nixos/       # Placeholder for shared NixOS configs
+│   ├── etc/nixos/       # Shared NixOS configs (packages/ directory for common configurations)
 │   └── home/<user>/     # User dotfiles (git, tmux, gemini, claude, zed, lazygit, ghostty, etc.)
 ├── scripts/             # Automation and deployment scripts
-├── README.md            # Comprehensive user guide (575 lines)
+├── README.md            # Comprehensive user guide (574 lines)
 ├── CLAUDE.md            # Claude Code guidance (this file)
-├── GEMINI.md            # Google Gemini guidance
-└── MIGRATION_PLAN.md    # Future Flake-based architecture plan
+├── GEMINI.md            # Google Gemini guidance (233 lines)
+├── MIGRATION_PLAN.md    # Future Flake-based architecture plan
+└── REFACTOR_PLAN_COMMON_NIX.md  # Plan for modularizing NixOS configuration
 ```
 
 **Key Architecture Points:**
-- Each hostname directory (e.g., `crazy-diamond/`, `thehand/`) contains configurations specific to that machine
-- The `global/` directory contains shared dotfiles that apply to all hosts
+- Each hostname directory (e.g., `crazy-diamond/`, `thehand/`) contains NixOS configurations specific to that machine
+- The `global/` directory contains shared dotfiles and NixOS configs that apply to all hosts
 - Stow manages symlinks with the `--dotfiles` flag (files prefixed with `dot-` become `.` in the target)
 - NixOS configuration files are in `etc/nixos/` and symlinked to `/etc/nixos/`
-- User dotfiles are in `home/<username>/` and symlinked to the user's home directory
+- User dotfiles are in `global/home/<username>/` and symlinked to the user's home directory
 
 ## Essential Commands
 
@@ -182,10 +182,11 @@ environment.systemPackages = [ unstable.some-package ];
 ## Important Files
 
 ### Documentation
-- `README.md` - Comprehensive user guide with workflows and troubleshooting (575 lines)
-- `CLAUDE.md` - This file, guidance for Claude Code
-- `GEMINI.md` - Guidance for Google Gemini
+- `README.md` - Comprehensive user guide with workflows and troubleshooting (574 lines)
+- `CLAUDE.md` - This file, guidance for Claude Code (712 lines)
+- `GEMINI.md` - Guidance for Google Gemini (233 lines)
 - `MIGRATION_PLAN.md` - Future Flake-based architecture migration plan
+- `REFACTOR_PLAN_COMMON_NIX.md` - Plan for modularizing NixOS configuration with common.nix
 
 ### NixOS Configuration
 - `<hostname>/etc/nixos/configuration.nix` - Main NixOS system configuration
@@ -223,12 +224,10 @@ environment.systemPackages = [ unstable.some-package ];
 
 ### When Adding New Dotfiles
 
-1. Determine if the dotfile is host-specific or global
-2. Host-specific: place in `<hostname>/home/<username>/`
-3. Global: place in `global/home/<username>/`
-4. Use `dot-` prefix for files that should become `.` files (e.g., `dot-bashrc` → `.bashrc`)
-5. Use `dot-config/app/file` for `.config/app/file` structure
-6. After adding files, run `./scripts/rebuild_nixos.sh` or manual stow command to create symlinks
+1. All user dotfiles should be placed in `global/home/<username>/` (host-specific user dotfiles are not currently used)
+2. Use `dot-` prefix for files that should become `.` files (e.g., `dot-bashrc` → `.bashrc`)
+3. Use `dot-config/app/file` for `.config/app/file` structure
+4. After adding files, run `./scripts/rebuild_nixos.sh` or manual stow command to create symlinks
 
 ### Using Automation Scripts
 
@@ -646,7 +645,8 @@ sudo nix-store --optimize
 
 **Safe to modify:**
 - `global/home/bagfen/*` - User dotfiles
-- `<hostname>/home/bagfen/*` - Host-specific user files
+- `global/etc/nixos/packages/*` - Shared NixOS configuration modules
+- `<hostname>/etc/nixos/configuration.nix` - Host-specific NixOS configuration
 
 ### Debugging Tips
 
@@ -678,10 +678,11 @@ nixos-rebuild switch --show-trace  # Detailed error traces
 
 ### Documentation Hierarchy
 
-1. **CLAUDE.md** (this file) - Technical engineer's guide with implementation details
-2. **README.md** - User-friendly guide (575 lines) with workflows and examples
-3. **GEMINI.md** - Project manager's guide with detailed script documentation
-4. **MIGRATION_PLAN.md** - Future architecture migration plan
+1. **CLAUDE.md** (this file) - Technical engineer's guide with implementation details (712 lines)
+2. **README.md** - User-friendly guide (574 lines) with workflows and examples
+3. **GEMINI.md** - Project manager's guide with detailed script documentation (233 lines)
+4. **MIGRATION_PLAN.md** - Future architecture migration plan (Flake-based)
+5. **REFACTOR_PLAN_COMMON_NIX.md** - Plan for modularizing current NixOS configuration
 
 ### When to Use What
 

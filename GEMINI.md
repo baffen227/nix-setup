@@ -23,13 +23,45 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 
 ```
 .
-├── <hostname>/           # Host-specific configurations (e.g., crazy-diamond, thehand)
-│   ├── etc/nixos/       # NixOS system configuration
-│   └── home/<user>/     # User-specific dotfiles
-├── global/              # Shared configurations across all hosts
-│   ├── etc/nixos/       # Shared NixOS configurations (e.g., packages)
-│   └── home/<user>/     # User dotfiles (git, tmux, gemini, claude, zed, lazygit, ghostty, etc.)
-└── scripts/             # Utility scripts for system management
+├── .gitignore
+├── CLAUDE.md
+├── GEMINI.md
+├── MIGRATION_PLAN.md
+├── README.md
+├── REFACTOR_PLAN_COMMON_NIX.md
+├── crazy-diamond/           # Host: crazy-diamond
+│   └── etc/
+│       └── nixos/
+│           ├── configuration.nix
+│           └── hardware-configuration.nix
+├── global/                  # Shared configurations
+│   ├── etc/
+│   │   └── nixos/
+│   │       └── packages/
+│   └── home/
+│       └── bagfen/
+│           ├── dot-gitconfig
+│           ├── dot-tmux.conf
+│           ├── dot-claude/
+│           ├── dot-config/
+│           │   ├── ghostty/
+│           │   ├── lazygit/
+│           │   └── zed/
+│           └── dot-gemini/
+├── scripts/                 # Management scripts
+│   ├── apply_stow.sh
+│   ├── backup_configs.sh
+│   ├── check_stow.sh
+│   ├── list_packages.sh
+│   ├── rebuild_nixos.sh
+│   ├── show_links.sh
+│   ├── unstow.sh
+│   └── validate_nix.sh
+└── thehand/                 # Host: thehand
+    └── etc/
+        └── nixos/
+            ├── configuration.nix
+            └── hardware-configuration.nix
 ```
 
 **Key Architecture Points:**
