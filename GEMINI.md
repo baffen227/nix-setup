@@ -28,7 +28,9 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 ├── GEMINI.md
 ├── MIGRATION_PLAN.md
 ├── README.md
-├── REFACTOR_PLAN_COMMON_NIX.md
+├── docs/
+│   └── archive/             # Completed planning documents
+│       └── REFACTOR_PLAN_COMMON_NIX.md  # ✅ Completed: common.nix refactoring
 ├── crazy-diamond/           # Host: crazy-diamond
 │   └── etc/
 │       └── nixos/

@@ -25,11 +25,13 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 │   ├── etc/nixos/       # Shared NixOS configs (packages/ directory for common configurations)
 │   └── home/<user>/     # User dotfiles (git, tmux, gemini, claude, zed, lazygit, ghostty, etc.)
 ├── scripts/             # Automation and deployment scripts
+├── docs/
+│   └── archive/         # Completed planning documents
+│       └── REFACTOR_PLAN_COMMON_NIX.md  # ✅ Completed: common.nix refactoring
 ├── README.md            # Comprehensive user guide (574 lines)
 ├── CLAUDE.md            # Claude Code guidance (this file)
 ├── GEMINI.md            # Google Gemini guidance (233 lines)
-├── MIGRATION_PLAN.md    # Future Flake-based architecture plan
-└── REFACTOR_PLAN_COMMON_NIX.md  # Plan for modularizing NixOS configuration
+└── MIGRATION_PLAN.md    # Future Flake-based architecture plan
 ```
 
 **Key Architecture Points:**
@@ -186,7 +188,7 @@ environment.systemPackages = [ unstable.some-package ];
 - `CLAUDE.md` - This file, guidance for Claude Code (712 lines)
 - `GEMINI.md` - Guidance for Google Gemini (233 lines)
 - `MIGRATION_PLAN.md` - Future Flake-based architecture migration plan
-- `REFACTOR_PLAN_COMMON_NIX.md` - Plan for modularizing NixOS configuration with common.nix
+- `docs/archive/REFACTOR_PLAN_COMMON_NIX.md` - ✅ Completed plan for common.nix refactoring (archived)
 
 ### NixOS Configuration
 - `<hostname>/etc/nixos/configuration.nix` - Main NixOS system configuration
@@ -682,7 +684,7 @@ nixos-rebuild switch --show-trace  # Detailed error traces
 2. **README.md** - User-friendly guide (574 lines) with workflows and examples
 3. **GEMINI.md** - Project manager's guide with detailed script documentation (233 lines)
 4. **MIGRATION_PLAN.md** - Future architecture migration plan (Flake-based)
-5. **REFACTOR_PLAN_COMMON_NIX.md** - Plan for modularizing current NixOS configuration
+5. **docs/archive/** - Completed planning documents (archived after implementation)
 
 ### When to Use What
 
