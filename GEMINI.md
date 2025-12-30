@@ -39,6 +39,7 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 ├── global/                  # Shared configurations
 │   ├── etc/
 │   │   └── nixos/
+│   │       ├── common.nix
 │   │       └── packages/
 │   └── home/
 │       └── bagfen/
@@ -210,6 +211,7 @@ environment.systemPackages = [ unstable.some-package ];
 
 - `<hostname>/etc/nixos/configuration.nix` - Main NixOS system configuration
 - `<hostname>/etc/nixos/hardware-configuration.nix` - Auto-generated hardware config (DO NOT manually edit)
+- `global/etc/nixos/common.nix` - Shared NixOS configuration common to all hosts
 - `global/home/bagfen/dot-gitconfig` - Git configuration with aliases
 - `global/home/bagfen/dot-tmux.conf` - tmux configuration (prefix: C-a)
 - `global/home/bagfen/dot-gemini/settings.json` - Gemini settings
