@@ -21,6 +21,15 @@ echo ""
 # Check if configuration files exist
 if [ ! -f /etc/nixos/configuration.nix ]; then
     echo -e "\033[0;31mERROR: /etc/nixos/configuration.nix not found\033[0m"
+    echo "This file should be symlinked from your hostname package."
+    echo "Run: ./rebuild_nixos.sh \$(hostname)"
+    exit 1
+fi
+
+if [ ! -f /etc/nixos/common.nix ]; then
+    echo -e "\033[0;31mERROR: /etc/nixos/common.nix not found\033[0m"
+    echo "This file should be symlinked from the global package."
+    echo "Run: ./apply_stow.sh global"
     exit 1
 fi
 
