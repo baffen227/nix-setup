@@ -22,7 +22,7 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 ├── <hostname>/           # Host-specific configurations (e.g., crazy-diamond, thehand)
 │   └── etc/nixos/       # NixOS system configuration
 ├── global/              # Shared configurations across all hosts
-│   ├── etc/nixos/       # Shared NixOS configs (packages/ directory for common configurations)
+│   ├── etc/nixos/       # Shared NixOS configs (common.nix with shared system configuration)
 │   └── home/<user>/     # User dotfiles (git, tmux, gemini, claude, zed, lazygit, ghostty, etc.)
 ├── scripts/             # Automation and deployment scripts
 ├── docs/
@@ -37,6 +37,10 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 **Key Architecture Points:**
 - Each hostname directory (e.g., `crazy-diamond/`, `thehand/`) contains NixOS configurations specific to that machine
 - The `global/` directory contains shared dotfiles and NixOS configs that apply to all hosts
+- **Modular NixOS configuration:**
+  - `global/etc/nixos/common.nix` - Shared configuration (242 lines): networking, desktop, packages, users
+  - `<hostname>/etc/nixos/configuration.nix` - Host-specific (28-61 lines): hardware, kernel, bootloader
+  - Eliminates 517 lines of duplicated code (80%+ reduction)
 - Stow manages symlinks with the `--dotfiles` flag (files prefixed with `dot-` become `.` in the target)
 - NixOS configuration files are in `etc/nixos/` and symlinked to `/etc/nixos/`
 - User dotfiles are in `global/home/<username>/` and symlinked to the user's home directory
@@ -119,67 +123,114 @@ sudo nix-channel --update
 
 ### Current Host: crazy-diamond
 
+**Configuration Structure:**
+- Host-specific config: 61 lines (down from 315 lines after common.nix refactoring)
+- Imports: `./hardware-configuration.nix`, `/etc/nixos/common.nix`, and nixos-hardware profiles
+- All shared configuration (desktop, packages, users, etc.) imported from `common.nix`
+
 **Hardware:**
 - AMD Ryzen 7 7840HS CPU (Zen 4)
 - AMD Radeon 780M iGPU (Phoenix architecture)
 - Uses latest kernel (`pkgs.linuxPackages_latest`)
 - AMD P-State EPP driver enabled via `boot.kernelParams = [ "amd_pstate=active" ]`
+- Hardware graphics acceleration enabled
 
-**Desktop Environment:**
-- GNOME with GDM display manager
-- Excluded many default GNOME applications (see configuration.nix:267-286)
-- fcitx5 input method with Chewing (Traditional Chinese)
+**Hardware Profiles (from nixos-hardware):**
+- `<nixos-hardware/common/pc/laptop>`
+- `<nixos-hardware/common/pc/ssd>`
+- `<nixos-hardware/common/cpu/amd>`
+- `<nixos-hardware/common/gpu/amd>`
 
-**Key Configuration Imports:**
-- Hardware profiles from nixos-hardware:
-  - `<nixos-hardware/common/pc/laptop>`
-  - `<nixos-hardware/common/pc/ssd>`
-  - `<nixos-hardware/common/cpu/amd>`
-  - `<nixos-hardware/common/gpu/amd>`
+**Host-Specific Settings:**
+- Kernel: Latest (`linuxPackages_latest`)
+- Kernel params: `amd_pstate=active`
+- Hardware graphics with 32-bit support
+- Firmware updates: `services.fwupd.enable = true`
+- Bootloader: systemd-boot
 
 ### Host: thehand
 
+**Configuration Structure:**
+- Host-specific config: 28 lines (down from 280 lines after common.nix refactoring)
+- Imports: `./hardware-configuration.nix`, `/etc/nixos/common.nix`, and nixos-hardware profile
+- All shared configuration (desktop, packages, users, etc.) imported from `common.nix`
+
 **Hardware:**
 - Lenovo ThinkPad T14s
-- Uses systemd-boot bootloader
 - Standard kernel (no special kernel parameters)
+
+**Hardware Profile (from nixos-hardware):**
+- `<nixos-hardware/lenovo/thinkpad/t14s>`
+
+**Host-Specific Settings:**
+- Bootloader: systemd-boot
+- Hostname: thehand
+- (Minimal configuration - most settings inherited from common.nix)
+
+### Common Configuration (global/etc/nixos/common.nix)
+
+All shared configuration is centralized in `global/etc/nixos/common.nix` (242 lines), eliminating 517 lines of duplicated code across hosts. This file contains:
+
+**Networking:**
+- NetworkManager enabled
+
+**Time & Locale:**
+- Time zone: Asia/Taipei
+- Locale: en_US.UTF-8 with zh_TW.UTF-8 regional settings
+- Input method: fcitx5 with Chewing (Traditional Chinese)
 
 **Desktop Environment:**
 - GNOME with GDM display manager
-- Excluded many default GNOME applications (see configuration.nix:232-251)
-- fcitx5 input method with Chewing (Traditional Chinese)
+- X11 windowing system with US keyboard layout
+- Excluded default GNOME apps: photos, tour, clocks, contacts, maps, music, weather, calendar, cheese, epiphany, geary, totem, simple-scan, games
 
-**Key Configuration Imports:**
-- Hardware profile from nixos-hardware:
-  - `<nixos-hardware/lenovo/thinkpad/t14s>`
+**Audio:**
+- PipeWire (PulseAudio compatibility enabled)
+- rtkit enabled for real-time scheduling
 
-### Common System Packages (Both Hosts)
+**Printing:**
+- CUPS enabled
 
-Both hosts share a comprehensive set of system packages:
+**Fonts:**
+- Noto fonts (including CJK Sans/Serif, Emoji)
+- Hack Nerd Font, Source Code Pro
+- Font Awesome, ttf-tw-moe (Taiwan MOE fonts)
 
-**Development tools:** git, vim, gnupg, lazygit
-**File management:** nnn, tree, file, eza, fzf
-**Archives:** p7zip, unzip, rar, xz, zip
-**Monitoring:** btop, iftop, iotop, lsof, ltrace, strace
-**System tools:** ethtool, lm_sensors, pciutils, sysstat, usbutils
-**Data processors:** glow, jq, yq-go
-**Other:** cowsay, neofetch, ripgrep, stow, nix-output-monitor
-**GNOME Extensions:** kimpanel, gnome-tweaks
-**Fonts:** Noto fonts (CJK), Hack Nerd Font, Source Code Pro, Font Awesome, ttf-tw-moe
+**System Packages (60+ packages):**
+- **Development tools:** git, vim, gnupg, lazygit
+- **File management:** nnn, tree, file, eza, fzf, stow
+- **Archives:** p7zip, unzip, rar, xz, zip
+- **Monitoring:** btop, iftop, iotop, lsof, ltrace, strace
+- **System tools:** ethtool, lm_sensors, pciutils, sysstat, usbutils
+- **Data processors:** glow, jq, yq-go
+- **Network:** wget, ripgrep
+- **Other:** cowsay, neofetch, nix-output-monitor
+- **GNOME:** kimpanel extension, gnome-tweaks
+
+**Programs:**
+- Firefox
+- AppImage support (with binfmt)
+- nix-ld (dynamic linker for non-NixOS binaries)
+
+**Users:**
+- User account: bagfen (in networkmanager and wheel groups)
+
+**System:**
+- Allow unfree packages
+- State version: 25.11
 
 ### Accessing Unstable Packages
 
-The configuration includes an `unstable` package set:
+The `unstable` channel is configured in `global/etc/nixos/common.nix`:
 ```nix
 let
   unstable = import <unstable> { config = { allowUnfree = true; }; };
 in
 ```
 
-To use unstable packages in configuration.nix, prefix with `unstable.`:
-```nix
-environment.systemPackages = [ unstable.some-package ];
-```
+To use unstable packages:
+- In `common.nix`: Prefix with `unstable.` (e.g., `unstable.some-package`)
+- In host configs: Add unstable package import at the top, or add packages to common.nix instead
 
 ## Important Files
 
@@ -191,7 +242,12 @@ environment.systemPackages = [ unstable.some-package ];
 - `docs/archive/REFACTOR_PLAN_COMMON_NIX.md` - ✅ Completed plan for common.nix refactoring (archived)
 
 ### NixOS Configuration
-- `<hostname>/etc/nixos/configuration.nix` - Main NixOS system configuration
+- `global/etc/nixos/common.nix` - Shared NixOS configuration across all hosts (242 lines)
+  - Contains: Networking, Time/Locale, Desktop (GNOME), Audio (PipeWire), Fonts, System packages, Users, Programs
+  - Imported by all host configurations to eliminate code duplication
+- `<hostname>/etc/nixos/configuration.nix` - Host-specific NixOS configuration
+  - crazy-diamond: 61 lines (hardware, kernel, graphics settings)
+  - thehand: 28 lines (hardware, bootloader, hostname only)
 - `<hostname>/etc/nixos/hardware-configuration.nix` - Auto-generated hardware config (DO NOT manually edit)
 
 ### Global Dotfiles
@@ -218,11 +274,12 @@ environment.systemPackages = [ unstable.some-package ];
 
 ### When Modifying NixOS Configuration
 
-1. Always read the current configuration.nix before making changes
-2. Test configuration before switching: `sudo nixos-rebuild dry-build` or `sudo nixos-rebuild test`
-3. Do not modify `hardware-configuration.nix` - it's auto-generated
-4. Keep host-specific configuration in `<hostname>/etc/nixos/configuration.nix`
-5. System state version (currently 25.11) should not be changed after initial install
+1. Always read the current configuration files before making changes
+2. **For shared configuration** (packages, desktop, users): Edit `global/etc/nixos/common.nix`
+3. **For host-specific configuration** (hardware, kernel, bootloader): Edit `<hostname>/etc/nixos/configuration.nix`
+4. Test configuration before switching: `sudo nixos-rebuild dry-build` or `sudo nixos-rebuild test`
+5. Do not modify `hardware-configuration.nix` - it's auto-generated
+6. System state version (currently 25.11) should not be changed after initial install
 
 ### When Adding New Dotfiles
 
@@ -647,8 +704,8 @@ sudo nix-store --optimize
 
 **Safe to modify:**
 - `global/home/bagfen/*` - User dotfiles
-- `global/etc/nixos/packages/*` - Shared NixOS configuration modules
-- `<hostname>/etc/nixos/configuration.nix` - Host-specific NixOS configuration
+- `global/etc/nixos/common.nix` - Shared NixOS configuration (networking, desktop, packages, users)
+- `<hostname>/etc/nixos/configuration.nix` - Host-specific NixOS configuration (hardware, kernel, bootloader)
 
 ### Debugging Tips
 
