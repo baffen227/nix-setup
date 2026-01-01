@@ -30,7 +30,8 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 ├── README.md
 ├── docs/
 │   └── archive/             # Completed planning documents
-│       └── REFACTOR_PLAN_COMMON_NIX.md  # ✅ Completed: common.nix refactoring
+│       ├── REFACTOR_PLAN_COMMON_NIX.md      # ✅ Completed: common.nix refactoring
+│       └── PACKAGES_MIGRATION_PLAN.md       # ✅ Completed: Package integration from dotfiles
 ├── crazy-diamond/           # Host: crazy-diamond
 │   └── etc/
 │       └── nixos/
@@ -39,8 +40,11 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 ├── global/                  # Shared configurations
 │   ├── etc/
 │   │   └── nixos/
-│   │       ├── common.nix
-│   │       └── packages/
+│   │       ├── common.nix   # Shared configuration (393 lines)
+│   │       └── neovim/      # Neovim plugin modules (4 files)
+│   │           ├── keymaps/
+│   │           ├── plugins/
+│   │           └── settings/
 │   └── home/
 │       └── bagfen/
 │           ├── dot-gitconfig
@@ -209,9 +213,17 @@ environment.systemPackages = [ unstable.some-package ];
 
 ## Important Files
 
-- `<hostname>/etc/nixos/configuration.nix` - Main NixOS system configuration
+### NixOS Configuration
+- `<hostname>/etc/nixos/configuration.nix` - Host-specific NixOS system configuration
 - `<hostname>/etc/nixos/hardware-configuration.nix` - Auto-generated hardware config (DO NOT manually edit)
-- `global/etc/nixos/common.nix` - Shared NixOS configuration common to all hosts
+- `global/etc/nixos/common.nix` - Shared NixOS configuration common to all hosts (393 lines)
+- `global/etc/nixos/neovim/` - Neovim plugin configuration modules (4 files)
+  - `keymaps/default.nix` - Vim keybindings
+  - `plugins/configs.nix` - Plugin configurations
+  - `plugins/packages.nix` - Plugin package lists
+  - `settings/options.nix` - Vim options
+
+### Dotfiles
 - `global/home/bagfen/dot-gitconfig` - Git configuration with aliases
 - `global/home/bagfen/dot-tmux.conf` - tmux configuration (prefix: C-a)
 - `global/home/bagfen/dot-gemini/settings.json` - Gemini settings
@@ -219,6 +231,10 @@ environment.systemPackages = [ unstable.some-package ];
 - `global/home/bagfen/dot-config/ghostty/config` - Ghostty terminal configuration
 - `global/home/bagfen/dot-config/lazygit/config.yml` - Lazygit configuration
 - `global/home/bagfen/dot-config/zed/settings.json` - Zed editor settings
+
+### Documentation
+- `docs/archive/REFACTOR_PLAN_COMMON_NIX.md` - ✅ Completed: common.nix refactoring
+- `docs/archive/PACKAGES_MIGRATION_PLAN.md` - ✅ Completed: Package integration from dotfiles
 
 ## Development Guidelines
 

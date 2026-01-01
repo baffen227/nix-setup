@@ -238,7 +238,12 @@ Validates NixOS configuration without applying changes.
 ```
 .
 ├── scripts/              # Helper scripts
+├── docs/
+│   └── archive/         # Completed planning documents
 ├── global/              # Shared dotfiles
+│   ├── etc/nixos/      # Shared NixOS configuration
+│   │   ├── common.nix  # System configuration (393 lines)
+│   │   └── neovim/     # Neovim plugin modules (4 files)
 │   └── home/bagfen/    # User dotfiles
 │       ├── dot-gitconfig
 │       ├── dot-tmux.conf

@@ -22,12 +22,15 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 ├── <hostname>/           # Host-specific configurations (e.g., crazy-diamond, thehand)
 │   └── etc/nixos/       # NixOS system configuration
 ├── global/              # Shared configurations across all hosts
-│   ├── etc/nixos/       # Shared NixOS configs (common.nix with shared system configuration)
+│   ├── etc/nixos/       # Shared NixOS configs (common.nix + neovim modules)
+│   │   ├── common.nix   # Shared system configuration (393 lines)
+│   │   └── neovim/      # Neovim plugin configuration (4 modules)
 │   └── home/<user>/     # User dotfiles (git, tmux, gemini, claude, zed, lazygit, ghostty, etc.)
 ├── scripts/             # Automation and deployment scripts
 ├── docs/
 │   └── archive/         # Completed planning documents
-│       └── REFACTOR_PLAN_COMMON_NIX.md  # ✅ Completed: common.nix refactoring
+│       ├── REFACTOR_PLAN_COMMON_NIX.md      # ✅ Completed: common.nix refactoring
+│       └── PACKAGES_MIGRATION_PLAN.md       # ✅ Completed: Package integration from dotfiles
 ├── README.md            # Comprehensive user guide (574 lines)
 ├── CLAUDE.md            # Claude Code guidance (this file)
 ├── GEMINI.md            # Google Gemini guidance (233 lines)
@@ -38,7 +41,8 @@ This is a personal NixOS dotfiles repository managed with GNU Stow for multiple 
 - Each hostname directory (e.g., `crazy-diamond/`, `thehand/`) contains NixOS configurations specific to that machine
 - The `global/` directory contains shared dotfiles and NixOS configs that apply to all hosts
 - **Modular NixOS configuration:**
-  - `global/etc/nixos/common.nix` - Shared configuration (242 lines): networking, desktop, packages, users
+  - `global/etc/nixos/common.nix` - Shared configuration (393 lines): networking, desktop, packages, users, services
+  - `global/etc/nixos/neovim/` - Neovim plugin modules (4 files): keymaps, plugins, settings
   - `<hostname>/etc/nixos/configuration.nix` - Host-specific (28-61 lines): hardware, kernel, bootloader
   - Eliminates 517 lines of duplicated code (80%+ reduction)
 - Stow manages symlinks with the `--dotfiles` flag (files prefixed with `dot-` become `.` in the target)
@@ -169,10 +173,12 @@ sudo nix-channel --update
 
 ### Common Configuration (global/etc/nixos/common.nix)
 
-All shared configuration is centralized in `global/etc/nixos/common.nix` (242 lines), eliminating 517 lines of duplicated code across hosts. This file contains:
+All shared configuration is centralized in `global/etc/nixos/common.nix` (393 lines), eliminating 517 lines of duplicated code across hosts. This file contains:
 
 **Networking:**
 - NetworkManager enabled
+- Firewall configured (ports 80, 443 open for development)
+- Reverse path drop logging enabled
 
 **Time & Locale:**
 - Time zone: Asia/Taipei
@@ -189,21 +195,35 @@ All shared configuration is centralized in `global/etc/nixos/common.nix` (242 li
 - rtkit enabled for real-time scheduling
 
 **Printing:**
-- CUPS enabled
+- CUPS enabled with foomatic-db drivers
+
+**Virtualization:**
+- Docker enabled
+- Container support enabled
+
+**Hardware:**
+- Saleae Logic Analyzer support enabled
+
+**Development Services:**
+- udev rules for embedded development (openocd for ST-LINK, CANable USB-CAN adapter)
 
 **Fonts:**
 - Noto fonts (including CJK Sans/Serif, Emoji)
 - Hack Nerd Font, Source Code Pro
 - Font Awesome, ttf-tw-moe (Taiwan MOE fonts)
 
-**System Packages (60+ packages):**
-- **Development tools:** git, vim, gnupg, lazygit
+**System Packages (85+ packages):**
+- **Development tools:** git, vim, gnupg, lazygit, claude-code, docker-compose, hoppscotch
+- **Nix tools:** nil, nixd, nixfmt-rfc-style, nixpkgs-fmt
 - **File management:** nnn, tree, file, eza, fzf, stow
 - **Archives:** p7zip, unzip, rar, xz, zip
 - **Monitoring:** btop, iftop, iotop, lsof, ltrace, strace
-- **System tools:** ethtool, lm_sensors, pciutils, sysstat, usbutils
+- **System tools:** ethtool, lm_sensors, pciutils, sysstat, usbutils, nettools, gparted, mkcert
 - **Data processors:** glow, jq, yq-go
 - **Network:** wget, ripgrep
+- **GUI Applications:** element-desktop, ghostty, libreoffice-fresh, vlc, flameshot, foliate
+- **Media:** ffmpeg
+- **Hardware:** saleae-logic-2, xorg.xeyes
 - **Other:** cowsay, neofetch, nix-output-monitor
 - **GNOME:** kimpanel extension, gnome-tweaks
 
@@ -211,9 +231,11 @@ All shared configuration is centralized in `global/etc/nixos/common.nix` (242 li
 - Firefox
 - AppImage support (with binfmt)
 - nix-ld (dynamic linker for non-NixOS binaries)
+- **Neovim** (configured with plugin system - see neovim/ directory)
+- **Editors:** Zed (unstable), VSCode/VSCodium with 20+ extensions
 
 **Users:**
-- User account: bagfen (in networkmanager and wheel groups)
+- User account: bagfen (in networkmanager, wheel, and dialout groups)
 
 **System:**
 - Allow unfree packages
@@ -236,15 +258,21 @@ To use unstable packages:
 
 ### Documentation
 - `README.md` - Comprehensive user guide with workflows and troubleshooting (574 lines)
-- `CLAUDE.md` - This file, guidance for Claude Code (712 lines)
+- `CLAUDE.md` - This file, guidance for Claude Code
 - `GEMINI.md` - Guidance for Google Gemini (233 lines)
 - `MIGRATION_PLAN.md` - Future Flake-based architecture migration plan
-- `docs/archive/REFACTOR_PLAN_COMMON_NIX.md` - ✅ Completed plan for common.nix refactoring (archived)
+- `docs/archive/REFACTOR_PLAN_COMMON_NIX.md` - ✅ Completed: common.nix refactoring (archived)
+- `docs/archive/PACKAGES_MIGRATION_PLAN.md` - ✅ Completed: Package integration from dotfiles (archived)
 
 ### NixOS Configuration
-- `global/etc/nixos/common.nix` - Shared NixOS configuration across all hosts (242 lines)
-  - Contains: Networking, Time/Locale, Desktop (GNOME), Audio (PipeWire), Fonts, System packages, Users, Programs
+- `global/etc/nixos/common.nix` - Shared NixOS configuration across all hosts (393 lines)
+  - Contains: Networking, Time/Locale, Desktop (GNOME), Audio (PipeWire), Fonts, System packages, Users, Programs, Services, Virtualization, Hardware
   - Imported by all host configurations to eliminate code duplication
+- `global/etc/nixos/neovim/` - Neovim plugin configuration modules (4 files)
+  - `keymaps/default.nix` - Vim keybindings
+  - `plugins/configs.nix` - Plugin configurations
+  - `plugins/packages.nix` - Plugin package lists (categorized: essential, navigation, git, language, lsp, ui, utilities)
+  - `settings/options.nix` - Vim options
 - `<hostname>/etc/nixos/configuration.nix` - Host-specific NixOS configuration
   - crazy-diamond: 61 lines (hardware, kernel, graphics settings)
   - thehand: 28 lines (hardware, bootloader, hostname only)
@@ -704,7 +732,8 @@ sudo nix-store --optimize
 
 **Safe to modify:**
 - `global/home/bagfen/*` - User dotfiles
-- `global/etc/nixos/common.nix` - Shared NixOS configuration (networking, desktop, packages, users)
+- `global/etc/nixos/common.nix` - Shared NixOS configuration (networking, desktop, packages, users, services)
+- `global/etc/nixos/neovim/*` - Neovim plugin configuration modules
 - `<hostname>/etc/nixos/configuration.nix` - Host-specific NixOS configuration (hardware, kernel, bootloader)
 
 ### Debugging Tips
@@ -737,11 +766,13 @@ nixos-rebuild switch --show-trace  # Detailed error traces
 
 ### Documentation Hierarchy
 
-1. **CLAUDE.md** (this file) - Technical engineer's guide with implementation details (712 lines)
+1. **CLAUDE.md** (this file) - Technical engineer's guide with implementation details
 2. **README.md** - User-friendly guide (574 lines) with workflows and examples
 3. **GEMINI.md** - Project manager's guide with detailed script documentation (233 lines)
 4. **MIGRATION_PLAN.md** - Future architecture migration plan (Flake-based)
 5. **docs/archive/** - Completed planning documents (archived after implementation)
+   - REFACTOR_PLAN_COMMON_NIX.md - ✅ Common.nix refactoring completed
+   - PACKAGES_MIGRATION_PLAN.md - ✅ Package integration from dotfiles completed
 
 ### When to Use What
 

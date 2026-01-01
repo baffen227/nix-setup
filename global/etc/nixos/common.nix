@@ -5,10 +5,20 @@
 
 let
   unstable = import <unstable> { config = { allowUnfree = true; }; };
+
+  # Neovim plugin packages (modular configuration)
+  neovimPluginPackages = import ./neovim/plugins/packages.nix { inherit pkgs; };
 in
 {
   # === NETWORKING ===
   networking.networkmanager.enable = true;
+
+  networking.firewall = {
+    # Open ports for development (HTTP/HTTPS)
+    allowedTCPPorts = [ 80 443 ];
+    # Log dropped packets for debugging
+    logReversePathDrops = true;
+  };
 
   # === TIME & LOCALE ===
   time.timeZone = "Asia/Taipei";
@@ -75,7 +85,25 @@ in
 
   # === PRINTING ===
   # Enable CUPS to print documents.
-  services.printing.enable = true;
+  services.printing = {
+    enable = true;
+    drivers = [
+      pkgs.foomatic-db
+      pkgs.foomatic-db-ppds
+    ];
+  };
+
+  # === DEVELOPMENT SERVICES ===
+  # udev rules for embedded development
+  services.udev = {
+    packages = [
+      pkgs.openocd  # ST-LINK devices for probe-rs
+    ];
+    extraRules = ''
+      # CANable USB-CAN adapter firmware update
+      SUBSYSTEMS=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="df11", MODE:="0666"
+    '';
+  };
 
   # === AUDIO ===
   # Enable sound with pipewire.
@@ -93,6 +121,16 @@ in
     # no need to redefine it in your config for now)
     #media-session.enable = true;
   };
+
+  # === VIRTUALIZATION ===
+  virtualisation = {
+    containers.enable = true;
+    docker.enable = true;
+  };
+
+  # === HARDWARE ===
+  # Saleae Logic Analyzer support
+  hardware.saleae-logic.enable = true;
 
   # === FONTS ===
   # For fine grained Font control (can set a font per language!) see: https://nixos.wiki/wiki/Fonts
@@ -155,6 +193,32 @@ in
     #  # But usually the ones listed above, plus glibc (which is available by default), are sufficient
     #  # If that server needs more specific libraries, they might need to be added here
     #];
+
+    # === EDITORS ===
+    neovim = {
+      enable = true;
+      defaultEditor = true;
+      viAlias = true;
+      vimAlias = true;
+
+      configure = {
+        customRC =
+          (import ./neovim/settings/options.nix)
+          + (import ./neovim/keymaps/default.nix)
+          + (import ./neovim/plugins/configs.nix);
+
+        packages.myVimPackage = {
+          start =
+            neovimPluginPackages.essential
+            ++ neovimPluginPackages.navigation
+            ++ neovimPluginPackages.git
+            ++ neovimPluginPackages.language
+            ++ neovimPluginPackages.lsp
+            ++ neovimPluginPackages.ui
+            ++ neovimPluginPackages.utilities;
+        };
+      };
+    };
   };
 
   # List packages installed in system profile. To search, run:
@@ -217,6 +281,108 @@ in
 
     # fonts
     ttf-tw-moe # Set of KAI and SONG fonts from the Ministry of Education of Taiwan
+
+    # === DEVELOPMENT TOOLS ===
+    unstable.claude-code      # Agentic coding tool for terminal
+    docker-compose            # Multi-container Docker applications
+    hoppscotch               # API development (Postman alternative)
+    nil                      # Nix language server
+    nixd                     # Feature-rich Nix LSP
+    nixfmt-rfc-style         # Official Nix formatter
+    nixpkgs-fmt              # nixpkgs Nix formatter
+    saleae-logic-2           # Logic analyzer software
+
+    # === GUI APPLICATIONS ===
+    element-desktop          # Matrix/Element chat client
+    ghostty                  # Modern terminal emulator
+
+    # Media & Productivity
+    ffmpeg                   # Video/audio processing
+    flameshot                # Screenshot tool
+    foliate                  # eBook reader
+    libreoffice-fresh        # Office suite
+    vlc                      # Media player
+
+    # System Tools
+    nettools                 # Network utilities
+    gparted                  # Disk partitioning tool
+    mkcert                   # Local development certificates
+    xorg.xeyes               # Check Xwayland vs Wayland
+
+    # === EDITORS ===
+    unstable.zed-editor      # Modern code editor
+
+    # === VSCODE (with extensions) ===
+    (unstable.vscode-with-extensions.override {
+      vscode = unstable.vscodium;
+      vscodeExtensions =
+        with unstable.vscode-extensions; [
+          # Official extensions
+          bbenoist.nix
+          arrterian.nix-env-selector
+          jnoortheen.nix-ide
+          streetsidesoftware.code-spell-checker
+          serayuzgur.crates
+          editorconfig.editorconfig
+          tamasfe.even-better-toml
+          zhuangtongfa.material-theme
+          rust-lang.rust-analyzer
+          gruntfuggly.todo-tree
+          vscodevim.vim
+          redhat.vscode-yaml
+        ]
+        ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
+          # GitHub Actions
+          {
+            name = "vscode-github-actions";
+            publisher = "me-dutour-mathieu";
+            version = "3.0.1";
+            sha256 = "I5qZk/svJIlnV2ggwMLu5Bfvly3vyshT5y51V4/nQLI=";
+          }
+          # Gitless
+          {
+            name = "gitless";
+            publisher = "maattdd";
+            version = "11.7.2";
+            sha256 = "rYeZNBz6HeZ059ksChGsXbuOao9H5m5lHGXJ4ELs6xc=";
+          }
+          # HTML/CSS support
+          {
+            name = "vscode-html-css";
+            publisher = "ecmel";
+            version = "2.0.9";
+            sha256 = "fDDVfS/5mGvV2qLJ9R7EuwQjnKI6Uelxpj97k9AF0pc=";
+          }
+          # Remote Explorer
+          {
+            name = "remote-explorer";
+            publisher = "ms-vscode";
+            version = "0.5.2024031109";
+            sha256 = "t8CeOuoCaK8ecJqMXRx8kA4CtP0x4srcn2SCez5tHOU=";
+          }
+          # TODO Highlight
+          {
+            name = "vscode-todo-highlight";
+            publisher = "wayou";
+            version = "1.0.5";
+            sha256 = "CQVtMdt/fZcNIbH/KybJixnLqCsz5iF1U0k+GfL65Ok=";
+          }
+          # Wokwi (Arduino/ESP32 simulator)
+          {
+            name = "wokwi-vscode";
+            publisher = "wokwi";
+            version = "2.4.3";
+            sha256 = "WDbukOWOyKfK6Q7Nq8J2cCfFSzDw4q0rvm3hD8SfJiA=";
+          }
+          # probe-rs debugger
+          {
+            name = "probe-rs-debugger";
+            publisher = "probe-rs";
+            version = "0.24.1";
+            sha256 = "sha256-Fb5a+sU+TahjhMTSCTg3eqKfjYMlrmbKyyD47Sr8qJY=";
+          }
+        ];
+    })
   ];
 
   # === USERS ===
@@ -224,7 +390,8 @@ in
   users.users.bagfen = {
     isNormalUser = true;
     description = "bagfen";
-    extraGroups = [ "networkmanager" "wheel" ];
+    # dialout: USB serial communication (https://nixos.wiki/wiki/Serial_Console)
+    extraGroups = [ "networkmanager" "wheel" "dialout" ];
     packages = with pkgs; [
     #  thunderbird
     ];
