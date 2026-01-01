@@ -1,10 +1,14 @@
 # Common NixOS configuration shared across all hosts
 # This module contains settings that are identical for both crazy-diamond and thehand
 
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 let
-  unstable = import <unstable> { config = { allowUnfree = true; }; };
+  unstable = import <unstable> {
+    config = {
+      allowUnfree = true;
+    };
+  };
 
   # Neovim plugin packages (modular configuration)
   neovimPluginPackages = import ./neovim/plugins/packages.nix { inherit pkgs; };
@@ -15,7 +19,10 @@ in
 
   networking.firewall = {
     # Open ports for development (HTTP/HTTPS)
-    allowedTCPPorts = [ 80 443 ];
+    allowedTCPPorts = [
+      80
+      443
+    ];
     # Log dropped packets for debugging
     logReversePathDrops = true;
   };
@@ -97,7 +104,7 @@ in
   # udev rules for embedded development
   services.udev = {
     packages = [
-      pkgs.openocd  # ST-LINK devices for probe-rs
+      pkgs.openocd # ST-LINK devices for probe-rs
     ];
     extraRules = ''
       # CANable USB-CAN adapter firmware update
@@ -235,7 +242,7 @@ in
     gnupg # Modern release of the GNU Privacy Guard, a GPL OpenPGP implementation
     lazygit # Simple terminal UI for git commands
     neofetch # Fast, highly customizable system info script
-    nnn #  Small ncurses-based file browser forked from noice
+    nnn # Small ncurses-based file browser forked from noice
     ripgrep # Utility that combines the usability of The Silver Searcher with the raw speed of grep
     stow # Tool for managing the installation of multiple software packages in the same run-time directory tree
     tree # Command to produce a depth indented directory listing
@@ -283,40 +290,41 @@ in
     ttf-tw-moe # Set of KAI and SONG fonts from the Ministry of Education of Taiwan
 
     # === DEVELOPMENT TOOLS ===
-    unstable.claude-code      # Agentic coding tool for terminal
-    docker-compose            # Multi-container Docker applications
-    hoppscotch               # API development (Postman alternative)
-    nil                      # Nix language server
-    nixd                     # Feature-rich Nix LSP
-    nixfmt-rfc-style         # Official Nix formatter
-    nixpkgs-fmt              # nixpkgs Nix formatter
-    saleae-logic-2           # Logic analyzer software
+    unstable.claude-code # Agentic coding tool for terminal
+    docker-compose # Multi-container Docker applications
+    hoppscotch # API development (Postman alternative)
+    nil # Nix language server
+    nixd # Feature-rich Nix LSP
+    nixfmt-rfc-style # Official Nix formatter
+    nixpkgs-fmt # nixpkgs Nix formatter
+    saleae-logic-2 # Logic analyzer software
 
     # === GUI APPLICATIONS ===
-    element-desktop          # Matrix/Element chat client
-    ghostty                  # Modern terminal emulator
+    element-desktop # Matrix/Element chat client
+    ghostty # Modern terminal emulator
 
     # Media & Productivity
-    ffmpeg                   # Video/audio processing
-    flameshot                # Screenshot tool
-    foliate                  # eBook reader
-    libreoffice-fresh        # Office suite
-    vlc                      # Media player
+    ffmpeg # Video/audio processing
+    flameshot # Screenshot tool
+    foliate # eBook reader
+    libreoffice-fresh # Office suite
+    vlc # Media player
 
     # System Tools
-    nettools                 # Network utilities
-    gparted                  # Disk partitioning tool
-    mkcert                   # Local development certificates
-    xorg.xeyes               # Check Xwayland vs Wayland
+    nettools # Network utilities
+    gparted # Disk partitioning tool
+    mkcert # Local development certificates
+    xorg.xeyes # Check Xwayland vs Wayland
 
     # === EDITORS ===
-    unstable.zed-editor      # Modern code editor
+    unstable.zed-editor # Modern code editor
 
     # === VSCODE (with extensions) ===
     (unstable.vscode-with-extensions.override {
       vscode = unstable.vscodium;
       vscodeExtensions =
-        with unstable.vscode-extensions; [
+        with unstable.vscode-extensions;
+        [
           # Official extensions
           bbenoist.nix
           arrterian.nix-env-selector
@@ -391,10 +399,14 @@ in
     isNormalUser = true;
     description = "bagfen";
     # dialout: USB serial communication (https://nixos.wiki/wiki/Serial_Console)
-    extraGroups = [ "networkmanager" "wheel" "dialout" ];
-    packages = with pkgs; [
-    #  thunderbird
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "dialout"
     ];
+    #packages = with pkgs; [
+    #  #  thunderbird
+    #];
   };
 
   # === STATE VERSION ===
